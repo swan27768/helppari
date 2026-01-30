@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:Vici16!@localhost:5432/helppari"
+}
+
+model Neighbourhood {
+  id         Int     @id @default(autoincrement())
+  name       String
+  postalCode String
+  isActive   Boolean @default(true)
+
+  users      User[]
+  posts      Post[]
+
+}
+
+model User {
+  id              Int      @id @default(autoincrement())
+  firstName       String
+  email           String   @unique
+  passwordHash    String
+  verified        Boolean  @default(false)
+  role            String   @default("user") 
+
+  neighbourhoodId Int
+  neighbourhood   Neighbourhood @relation(fields: [neighbourhoodId], references: [id])
+
+  createdAt       DateTime @default(now())
+  posts           Post[]
+}
+
+model Post {
+  id              Int      @id @default(autoincrement())
+  title           String
+  body            String
+  type            String   // need | help | notice
+  status          String   @default("open")
+
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+
+  neighbourhoodId Int
+  neighbourhood   Neighbourhood @relation(fields: [neighbourhoodId], references: [id])
+
+  createdAt       DateTime @default(now())
+}
