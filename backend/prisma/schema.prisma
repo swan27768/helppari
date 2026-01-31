@@ -8,43 +8,38 @@ datasource db {
 }
 
 model Neighbourhood {
-  id         Int     @id @default(autoincrement())
-  name       String
-  postalCode String
-  isActive   Boolean @default(true)
+  id   Int    @id @default(autoincrement())
+  name String
 
-  users      User[]
-  posts      Post[]
-
+  users User[]
+  posts Post[]
 }
 
 model User {
-  id              Int      @id @default(autoincrement())
-  firstName       String
-  email           String   @unique
-  passwordHash    String
-  verified        Boolean  @default(false)
-  role            String   @default("user") 
+  id           Int     @id @default(autoincrement())
+  firstName    String
+  email        String  @unique
+  passwordHash String
+  verified     Boolean @default(false)
+  role         String  @default("user")
 
   neighbourhoodId Int
   neighbourhood   Neighbourhood @relation(fields: [neighbourhoodId], references: [id])
 
-  createdAt       DateTime @default(now())
-  posts           Post[]
+  createdAt DateTime @default(now())
+  posts     Post[]
 }
 
 model Post {
   id              Int      @id @default(autoincrement())
   title           String
   body            String
-  type            String   // need | help | notice
-  status          String   @default("open")
-
+  type            String
+  status          String   @default("active")
   userId          Int
-  user            User     @relation(fields: [userId], references: [id])
-
   neighbourhoodId Int
-  neighbourhood   Neighbourhood @relation(fields: [neighbourhoodId], references: [id])
-
   createdAt       DateTime @default(now())
+
+  user          User          @relation(fields: [userId], references: [id])
+  neighbourhood Neighbourhood @relation(fields: [neighbourhoodId], references: [id])
 }

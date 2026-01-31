@@ -1,29 +1,28 @@
-# ===== Node / npm =====
+# Node
 node_modules/
 npm-debug.log*
-yarn-error.log*
-pnpm-debug.log*
 
-# ===== Environment variables =====
-.env
-.env.local
-.env.*.local
-
-# ===== Expo / React Native =====
+# Expo / React Native
 .expo/
 .expo-shared/
 web-build/
 
-# ===== Build output =====
-dist/
-build/
+# Env
+.env
+.env.*
 
-# ===== Prisma =====
-prisma/dev.db
-prisma/dev.db-journal
+# Prisma
+backend/prisma/dev.db
+backend/prisma/*.db
+backend/prisma/migrations/*/migration_lock.toml
 
-# ===== OS / Editor =====
+# OS / Editor
 .DS_Store
 Thumbs.db
-.vscode/*
-!.vscode/extensions.json
+.vscode/
+.idea/
+
+# Android / iOS
+android/
+ios/
+*.keystore
