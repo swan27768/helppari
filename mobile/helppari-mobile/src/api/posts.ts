@@ -1,4 +1,4 @@
-import { http } from "./http";
+import { api } from "../lib/api";
 
 /* ---------- Types ---------- */
 
@@ -21,10 +21,10 @@ export type PostsResponse = {
 /* ---------- Fetch feed ---------- */
 
 export async function fetchPosts(cursor?: string) {
-  const query = new URLSearchParams();
-  if (cursor) query.append("cursor", cursor);
-
-  return http.get<PostsResponse>(`/posts?${query.toString()}`);
+  const res = await api.get("/posts", {
+    params: { cursor },
+  });
+  return res.data;
 }
 
 /* ---------- Create post ---------- */
@@ -35,4 +35,9 @@ export async function createPost(input: {
   type: string;
 }) {
   return http.post("/posts", input);
+}
+/* ---------- Delete post ---------- */
+
+export async function deletePost(postId: number): Promise<void> {
+  await http.del(`/posts/${postId}`);
 }

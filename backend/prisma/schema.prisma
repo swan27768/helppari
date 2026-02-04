@@ -8,8 +8,9 @@ datasource db {
 }
 
 model Neighbourhood {
-  id   Int    @id @default(autoincrement())
-  name String
+  id         Int    @id @default(autoincrement())
+  name       String
+  postalCode String @unique @default("00000")
 
   users User[]
   posts Post[]
@@ -27,7 +28,10 @@ model User {
   neighbourhood   Neighbourhood @relation(fields: [neighbourhoodId], references: [id])
 
   createdAt DateTime @default(now())
-  posts     Post[]
+
+  // ⭐ RELAATIOT
+  posts    Post[]
+  comments Comment[]
 }
 
 model Post {
@@ -42,4 +46,18 @@ model Post {
 
   user          User          @relation(fields: [userId], references: [id])
   neighbourhood Neighbourhood @relation(fields: [neighbourhoodId], references: [id])
+
+  // ⭐ LISÄTTY: kommentit
+  comments Comment[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  body      String
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }

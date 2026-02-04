@@ -22,13 +22,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🔹 Ladataan token käynnistyksessä
+  // 🔹 Lataa token sovelluksen käynnistyessä
   useEffect(() => {
+    let mounted = true;
+
     (async () => {
       const storedToken = await getToken();
-      setTokenState(storedToken);
-      setIsLoading(false);
+      if (mounted) {
+        setTokenState(storedToken);
+        setIsLoading(false);
+      }
     })();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -38,7 +46,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // 🔑 LOGIN
       signIn: async (email: string, password: string) => {
-        const accessToken = await AuthApi.login({ email, password });
+        const res = await AuthApi.login(email, password);
+        const accessToken = res.accessToken;
+
         await setToken(accessToken);
         setTokenState(accessToken);
       },
