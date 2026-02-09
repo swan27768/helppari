@@ -155,9 +155,54 @@ export default function Home() {
 
       {posts.length === 0 ? (
         <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 32,
+          }}
         >
-          <Text>Ei vielä naapuriapupyyntöjä.</Text>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "700",
+              textAlign: "center",
+              marginBottom: 12,
+            }}
+          >
+            Tämä tila herää eloon, kun joku aloittaa.
+          </Text>
+
+          <Text
+            style={{
+              fontSize: 14,
+              color: "#6b7280",
+              textAlign: "center",
+              marginBottom: 24,
+            }}
+          >
+            Ole ensimmäinen ja julkaise viesti naapurustolle.
+          </Text>
+
+          <Pressable
+            onPress={() => router.push("/(app)/create")}
+            style={{
+              backgroundColor: "#2563eb",
+              paddingHorizontal: 24,
+              paddingVertical: 14,
+              borderRadius: 10,
+            }}
+          >
+            <Text
+              style={{
+                color: "white",
+                fontWeight: "600",
+                fontSize: 16,
+              }}
+            >
+              Julkaise ensimmäinen viesti
+            </Text>
+          </Pressable>
         </View>
       ) : (
         <FlatList
@@ -271,6 +316,12 @@ export default function Home() {
                 key={`${item.id}-${commentRefreshKey[item.id] ?? 0}`}
                 postId={item.id}
                 refreshKey={commentRefreshKey[item.id]}
+                onDeleted={() => {
+                  setCommentRefreshKey((prev) => ({
+                    ...prev,
+                    [item.id]: (prev[item.id] ?? 0) + 1,
+                  }));
+                }}
               />
 
               {/* ✍️ KIRJOITA KOMMENTTI */}

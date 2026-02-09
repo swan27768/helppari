@@ -20,10 +20,11 @@ export type PostsResponse = {
 
 /* ---------- Fetch feed ---------- */
 
-export async function fetchPosts(cursor?: string) {
-  const res = await api.get("/posts", {
-    params: { cursor },
+export async function fetchPosts(cursor?: string): Promise<PostsResponse> {
+  const res = await api.get<PostsResponse>("/posts", {
+    params: cursor ? { cursor } : undefined,
   });
+
   return res.data;
 }
 
@@ -33,11 +34,13 @@ export async function createPost(input: {
   title: string;
   body: string;
   type: string;
-}) {
-  return http.post("/posts", input);
+}): Promise<Post> {
+  const res = await api.post<Post>("/posts", input);
+  return res.data;
 }
+
 /* ---------- Delete post ---------- */
 
 export async function deletePost(postId: number): Promise<void> {
-  await http.del(`/posts/${postId}`);
+  await api.delete(`/posts/${postId}`);
 }

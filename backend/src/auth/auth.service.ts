@@ -19,7 +19,7 @@ export class AuthService {
       where: { email },
     });
 
-    // Älä paljasta, onko email vai salasana väärin
+    // ❌ Väärät tunnukset
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -36,8 +36,10 @@ export class AuthService {
       role: user.role,
     };
 
+    const accessToken = this.jwtService.sign(payload);
+
     return {
-      accessToken: this.jwtService.sign(payload),
+      accessToken,
     };
   }
 
@@ -63,7 +65,7 @@ export class AuthService {
         email,
         passwordHash,
         neighbourhoodId: neighbourhood.id,
-        verified: true, // dev-vaiheessa ok, myöhemmin email-verifiointi
+        verified: true,
       },
     });
   }

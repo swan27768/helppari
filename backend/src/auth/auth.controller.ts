@@ -11,7 +11,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('register')
   async register(
@@ -33,15 +33,24 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() body: { email: string; password: string }) {
-    // 🔍 TÄMÄ LOGI ON KRIITTINEN – älä poista vielä
+    // 🔍 DEBUG – voit poistaa myöhemmin
     console.log('LOGIN BODY (controller):', body);
 
     return this.authService.login(body.email, body.password);
   }
 
+  /**
+   * 🔑 GET /auth/me
+   * Palauttaa JWT:stä puretun käyttäjän
+   * (userId, email, role)
+   */
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  getProfile(@Request() req: any) {
-    return req.user;
+  getMe(@Request() req: any) {
+    return {
+      userId: req.user.userId,
+      email: req.user.email,
+      role: req.user.role,
+    };
   }
 }

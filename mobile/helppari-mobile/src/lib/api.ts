@@ -1,12 +1,6 @@
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
 
-/**
- * Fyysinen Android-laite:
- * http://192.168.1.139:3000
- *
- * (Muuta tarvittaessa ympäristön mukaan)
- */
 const BASE_URL = "http://192.168.1.139:3000";
 
 export const api = axios.create({
@@ -17,15 +11,10 @@ export const api = axios.create({
   },
 });
 
-/**
- * Lisää JWT-token automaattisesti kaikkiin pyyntöihin
- */
 api.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync("token");
-
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-
   return config;
 });

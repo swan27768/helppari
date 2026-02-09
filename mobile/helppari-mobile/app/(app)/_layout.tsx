@@ -1,12 +1,18 @@
 import { Stack, Redirect } from "expo-router";
 import { useAuth } from "../../src/auth/AuthContext";
+import { ActivityIndicator, View } from "react-native";
 
 export default function AppLayout() {
   const { token, isLoading } = useAuth();
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
 
-  // 🔐 EI TOKENIA → LOGIN
   if (!token) {
     return <Redirect href="/login" />;
   }

@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 @Injectable()
 export class PostsService {
   constructor(private prisma: PrismaService) {}
 
+  // 🔹 CREATE
   async createPost(userId: number, title: string, body: string, type: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -22,10 +26,12 @@ export class PostsService {
         type,
         userId: user.id,
         neighbourhoodId: user.neighbourhoodId,
+        status: 'active',
       },
     });
   }
 
+  // 🔹 SOFT DELETE
   async deletePost(postId: number, user: { userId: number; role: string }) {
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
@@ -44,44 +50,14 @@ export class PostsService {
 
     return this.prisma.post.update({
       where: { id: postId },
-      data: { status: 'deleted' }, // ⭐ SOFT DELETE
+      data: { status: 'deleted' },
     });
   }
 
-  async getPostsForUser(userId: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    return this.prisma.post.findMany({
-      where: {
-        neighbourhoodId: user.neighbourhoodId,
-        status: { not: 'deleted' }, // ⭐ TÄRKEÄ
-      },
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: { select: { firstName: true } },
-      },
-    });
-  }
-  async getFeed(params: { userId: number; limit: number; cursor?: string }) {
-    const { userId, limit, cursor } = params;
-
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
+  // 🔹 FEED (cursor-pagination)
+  async getFeed(cursor?: string, limit = 10) {
     const posts = await this.prisma.post.findMany({
       where: {
-        neighbourhoodId: user.neighbourhoodId,
         status: { not: 'deleted' },
         ...(cursor && {
           createdAt: {
@@ -95,7 +71,10 @@ export class PostsService {
       take: limit + 1,
       include: {
         user: {
-          select: { firstName: true },
+          select: {
+            id: true,
+            firstName: true,
+          },
         },
       },
     });

@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import { useState } from "react";
 import { Redirect } from "expo-router";
 import { useAuth } from "../src/auth/AuthContext";
@@ -17,9 +17,16 @@ export default function Login() {
 
   const handleLogin = async () => {
     if (loading) return;
+
     try {
       setLoading(true);
       await signIn(email, password);
+    } catch (e: any) {
+      console.log("LOGIN FAILED:", e);
+      Alert.alert(
+        "Kirjautuminen epäonnistui",
+        e?.response?.data?.message ?? "Tarkista sähköposti ja salasana",
+      );
     } finally {
       setLoading(false);
     }
@@ -40,6 +47,7 @@ export default function Login() {
         value={email}
         onChangeText={setEmail}
         autoCapitalize="none"
+        keyboardType="email-address"
         style={{
           borderWidth: 1,
           padding: 10,
@@ -61,8 +69,9 @@ export default function Login() {
 
       <Pressable
         onPress={handleLogin}
+        disabled={loading}
         style={{
-          backgroundColor: "#2563eb",
+          backgroundColor: loading ? "#9ca3af" : "#2563eb",
           padding: 14,
           borderRadius: 8,
         }}

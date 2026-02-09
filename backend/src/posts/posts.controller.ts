@@ -1,31 +1,33 @@
 import {
   Controller,
-  Post,
   Get,
+  Post,
   Delete,
   Body,
   Param,
   UseGuards,
   Request,
+  Query,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { Query } from '@nestjs/common';
+import { PostsService } from './posts.service';
 
-@UseGuards(JwtAuthGuard)
 @Controller('posts')
 export class PostsController {
   constructor(private postsService: PostsService) {}
 
+  // 🔓 FEED (julkinen)
+  @Get()
+  getFeed(@Query('cursor') cursor?: string) {
+    return this.postsService.getFeed(cursor);
+  }
+
+  // 🔒 LUO POST
+  @UseGuards(JwtAuthGuard)
   @Post()
-  async create(
+  create(
     @Request() req: any,
-    @Body()
-    body: {
-      title: string;
-      body: string;
-      type: string;
-    },
+    @Body() body: { title: string; body: string; type: string },
   ) {
     return this.postsService.createPost(
       req.user.userId,
@@ -35,25 +37,10 @@ export class PostsController {
     );
   }
 
+  // 🔒 POISTA POST
   @UseGuards(JwtAuthGuard)
-  @Get()
-  async findAll(
-    @Request() req: any,
-    @Query('limit') limit?: string,
-    @Query('cursor') cursor?: string,
-  ) {
-    return this.postsService.getFeed({
-      userId: req.user.userId,
-      limit: limit ? Number(limit) : 10,
-      cursor,
-    });
-  }
-
   @Delete(':id')
-  async remove(@Param('id') id: string, @Request() req: any) {
-    return this.postsService.deletePost(Number(id), {
-      userId: req.user.userId,
-      role: req.user.role,
-    });
+  remove(@Request() req: any, @Param('id') id: string) {
+    return this.postsService.deletePost(Number(id), req.user);
   }
 }
